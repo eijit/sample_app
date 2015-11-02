@@ -41,6 +41,32 @@ describe "User pages" do
       it "should create a user" do
         expect { click_button submit }.to change(User, :count).by(1)
       end
+
+      describe "after saving the user" do
+        before { click_button submit }
+        let(:user) { User.find_by(email: 'user@example.com') }
+
+        it { should have_title(user.name) }
+        it { should have_selector('div.alert.alert-success', text: 'Welcome') }
+      end
     end
+
+    describe "with invalid information" do
+      before do
+        fill_in "Name",         with: "Example User"
+        fill_in "Email",        with: "user@example.com"
+        fill_in "Password",     with: "a"
+        fill_in "Confirmation", with: "b"
+      end
+
+      describe "after submission" do
+        before { click_button submit }
+        it { should have_title('Sign up') }
+        it { should have_content('The form contains 2 errors.') }
+        it { should have_content('Password confirmation doesn\'t match Password' ) }
+        it { should have_content('Password is too short (minimum is 6 characters)' ) }
+      end
+    end
+
   end
 end
